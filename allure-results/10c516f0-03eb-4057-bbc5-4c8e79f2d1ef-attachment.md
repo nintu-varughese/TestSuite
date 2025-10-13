@@ -1,0 +1,88 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "QA Playground" [ref=e4] [cursor=pointer]:
+      - /url: /
+      - heading "QA Playground" [level=1] [ref=e5]
+    - link "full courses" [ref=e7] [cursor=pointer]:
+      - /url: /#apps
+      - img [ref=e8]
+      - text: Apps
+    - link "Playwright logo View Test Suite" [ref=e19] [cursor=pointer]:
+      - /url: https://github.com/marko-simic/qa-playground-tests/blob/main/tests/dynamic-table.spec.js
+      - img "Playwright logo" [ref=e21]
+      - generic [ref=e22]: View Test Suite
+  - table [ref=e24]:
+    - rowgroup [ref=e25]:
+      - row "Superhero Status Real Name" [ref=e26]:
+        - cell "Superhero" [ref=e27]
+        - cell "Status" [ref=e28]
+        - cell "Real Name" [ref=e29]
+    - rowgroup [ref=e30]:
+      - row "Deadpool deadpool@avengers.com Active Wade Wilson" [ref=e31]:
+        - cell "Deadpool deadpool@avengers.com" [ref=e32]:
+          - generic [ref=e35]:
+            - generic [ref=e36]: Deadpool
+            - generic [ref=e37]: deadpool@avengers.com
+        - cell "Active" [ref=e38]:
+          - generic [ref=e39]: Active
+        - cell "Wade Wilson" [ref=e40]
+      - row "Doctor Strange doctor-strange@avengers.com Active Stephen Vincent Strange" [ref=e41]:
+        - cell "Doctor Strange doctor-strange@avengers.com" [ref=e42]:
+          - generic [ref=e45]:
+            - generic [ref=e46]: Doctor Strange
+            - generic [ref=e47]: doctor-strange@avengers.com
+        - cell "Active" [ref=e48]:
+          - generic [ref=e49]: Active
+        - cell "Stephen Vincent Strange" [ref=e50]
+      - row "Iron Man iron-man@avengers.com Active Anthony 'Tony' Stark" [ref=e51]:
+        - cell "Iron Man iron-man@avengers.com" [ref=e52]:
+          - generic [ref=e55]:
+            - generic [ref=e56]: Iron Man
+            - generic [ref=e57]: iron-man@avengers.com
+        - cell "Active" [ref=e58]:
+          - generic [ref=e59]: Active
+        - cell "Anthony 'Tony' Stark" [ref=e60]
+      - row "Spider-Man spider-man@avengers.com Active Peter Parker" [ref=e61]:
+        - cell "Spider-Man spider-man@avengers.com" [ref=e62]:
+          - generic [ref=e65]:
+            - generic [ref=e66]: Spider-Man
+            - generic [ref=e67]: spider-man@avengers.com
+        - cell "Active" [ref=e68]:
+          - generic [ref=e69]: Active
+        - cell "Peter Parker" [ref=e70]
+      - row "Ant-Man ant-man@avengers.com Active Eric O'Grady" [ref=e71]:
+        - cell "Ant-Man ant-man@avengers.com" [ref=e72]:
+          - generic [ref=e75]:
+            - generic [ref=e76]: Ant-Man
+            - generic [ref=e77]: ant-man@avengers.com
+        - cell "Active" [ref=e78]:
+          - generic [ref=e79]: Active
+        - cell "Eric O'Grady" [ref=e80]
+      - row "Captain America captain-america@avengers.com Active Steve Rogers" [ref=e81]:
+        - cell "Captain America captain-america@avengers.com" [ref=e82]:
+          - generic [ref=e85]:
+            - generic [ref=e86]: Captain America
+            - generic [ref=e87]: captain-america@avengers.com
+        - cell "Active" [ref=e88]:
+          - generic [ref=e89]: Active
+        - cell "Steve Rogers" [ref=e90]
+      - row "Black Widow black-widow@avengers.com Active Natasha Alianovna Romanova" [ref=e91]:
+        - cell "Black Widow black-widow@avengers.com" [ref=e92]:
+          - generic [ref=e95]:
+            - generic [ref=e96]: Black Widow
+            - generic [ref=e97]: black-widow@avengers.com
+        - cell "Active" [ref=e98]:
+          - generic [ref=e99]: Active
+        - cell "Natasha Alianovna Romanova" [ref=e100]
+      - row "Hulk hulk@avengers.com Active Robert Bruce Banner" [ref=e101]:
+        - cell "Hulk hulk@avengers.com" [ref=e102]:
+          - generic [ref=e105]:
+            - generic [ref=e106]: Hulk
+            - generic [ref=e107]: hulk@avengers.com
+        - cell "Active" [ref=e108]:
+          - generic [ref=e109]: Active
+        - cell "Robert Bruce Banner" [ref=e110]
+```

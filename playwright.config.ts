@@ -15,19 +15,21 @@ export default defineConfig({
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
+
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 5 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
      reporter: [
     //['html', { outputFolder: 'playwright-report', open: 'never' }],
     //['junit', { outputFile: 'results.xml' }],
+     ['html', { open: 'always' }],
     ['list'],
     ['allure-playwright', {
-    outputFolder: 'allure-results',
+    outputFolder: process.env.ALLURE_RESULTS_DIR || 'allure-results',
     detail: false,                 
     suiteTitle: false,              
     useCucumberStepReporter: false, 
@@ -43,6 +45,7 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'on', // Attach screenshots automatically
     video: 'on',
+    headless:false
   },
 
   /* Configure projects for major browsers */
