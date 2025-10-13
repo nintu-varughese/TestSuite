@@ -25,7 +25,7 @@ export default class Playground {
   readonly countp: Locator;
   readonly remov: (word: string) => Locator;
 
-  // Locators for New Tab
+  // Locators for New Tab        
   readonly Newtab: Locator;
   readonly opentabb: Locator;
   readonly newtabHead: Locator;
@@ -258,26 +258,21 @@ export default class Playground {
   }
 
   /** Enter multiple tags */
-  async Enteratgs() {
-    const newTags = [
-      "vue",
-      "python",
-      "go",
-      "react",
-      "svelte",
-      "tailwind",
-      "linux",
-      "ios",
-      "android",
-      "docker",
-    ];
-    for (let index = 0; index < 10; index++) {
-      await this.Inp.fill(newTags[index]);
-      await this.Inp.click();
-      await this.page.keyboard.press("Enter");
-    }
-  }
+async Enteratgs() {
+  // Get the path to the JSON file
+  const tagsFilePath = path.join(__dirname, "../DATA/tags.json");
 
+  // Read and parse the JSON file
+  const jsonData = JSON.parse(fs.readFileSync(tagsFilePath, "utf-8"));
+  const newTags: string[] = jsonData.tags;
+
+  // Fill and enter tags from JSON
+  for (let index = 0; index < newTags.length; index++) {
+    await this.Inp.fill(newTags[index]);
+    await this.Inp.click();
+    await this.page.keyboard.press("Enter");
+  }
+}
   /**
    * Remove a specific tag
    * @param {string} word - The tag name to remove.
