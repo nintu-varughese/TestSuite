@@ -92,6 +92,11 @@ export default class Playground {
   readonly feedBack: Locator;
   readonly fileButton: Locator;
 
+  readonly modalHeading: Locator;
+  readonly closeIcon: Locator;
+  readonly welcomeMessage: Locator;
+ 
+
   constructor(page: Page) {
     this.page = page;
 
@@ -191,6 +196,10 @@ export default class Playground {
 
     this.feedBack = page.locator("#feedback");
     this.fileButton = this.page.locator("//a[@id='file']");
+
+    this.modalHeading = page.locator('//h3[text()="Onboarding Modal Popup"]');
+    this.closeIcon = page.locator('//i[@class="fas fa-bars"]');
+    this.welcomeMessage = page.locator('div.title', { hasText: 'Welcome Peter Parker!' });
   }
 
   /** Launch QA Playground website */
@@ -480,5 +489,13 @@ async Enteratgs() {
     await download.saveAs(filePath);
     expect(fs.existsSync(filePath), "file name to be true").toBeTruthy();
     expect(path.extname(filePath), "Expect file to be pdf").toBe(".pdf");
+  }
+
+  /**
+   * Opens the Modal Popup section and closes the popup via the close icon.
+   */
+  async openModalPopupSection(): Promise<void> {
+    await this.modalHeading.click();
+    await this.closeIcon.click();
   }
 }

@@ -275,4 +275,11 @@ test.describe("QA PLAYGROUND SITE DEMO FUNCTIONALITIES ", () => {
     await playg.navtodownloadfile();
     await playg.downloadFile();
   });
+
+  test(' Close modal popup if displayed and assert welcome message', async ({playg}) => {
+  await playg.openModalPopupSection();
+  await expect(playg.welcomeMessage,
+    'Modal popup welcome message "Welcome Peter Parker!" is not visible.'
+  ).toBeVisible();
+});
 });
