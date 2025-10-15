@@ -1,4 +1,4 @@
-import { Page, test, Locator, expect } from "@playwright/test";
+import { Page, expect, Locator } from "@playwright/test";
 import { SrvRecord } from "dns";
 import path from "path";
 import fs from "fs";
@@ -6,176 +6,163 @@ import fs from "fs";
 export default class Playground {
   // Page reference
   readonly page: Page;
-
   // Locators for Dynamic Table
-  readonly Mainhead: Locator;
-  readonly DynamicTablelink: Locator;
+  readonly mainHead: Locator;
+  readonly dynamicTableLink: Locator;
   readonly spidermanName: Locator;
-  readonly spiderealname: Locator;
-
+  readonly spideRealName: Locator;
   // Locators for Verify Account
-  readonly Verifyacclink: Locator;
-  readonly Verifyhead: Locator;
-  readonly successmesg: Locator;
-
+  readonly verifyAccLink: Locator;
+  readonly verifyHead: Locator;
+  readonly successMsg: Locator;
   // Locators for Tags Input Box
-  readonly Tagsinput: Locator;
-  readonly Tagshead: Locator;
-  readonly Inp: Locator;
-  readonly countp: Locator;
+  readonly tagsInput: Locator;
+  readonly tagsHead: Locator;
+  readonly inp: Locator;
+  readonly countP: Locator;
   readonly remov: (word: string) => Locator;
-
-  // Locators for New Tab        
-  readonly Newtab: Locator;
-  readonly opentabb: Locator;
-  readonly newtabHead: Locator;
-
+  // Locators for New Tab
+  readonly newTab: Locator;
+  readonly openTabB: Locator;
+  readonly newTabHead: Locator;
   // Locators for Pop-up
-  readonly popuptab: Locator;
-  readonly Popup: Locator;
-  readonly popedupb: Locator;
-  readonly popmesage: Locator;
-
+  readonly popUpTab: Locator;
+  readonly popUp: Locator;
+  readonly popedUpB: Locator;
+  readonly popMesage: Locator;
   // Locators for Nested Iframe
-  readonly iframlink: Locator;
-  readonly iframClickb: Locator;
-  readonly iframval: Locator;
-
+  readonly iframeLink: Locator;
+  readonly iframeClickB: Locator;
+  readonly iframeVal: Locator;
   // Locators for Navigation Menu
-  readonly navigationmenulink: Locator;
-  readonly homelink: Locator;
-  readonly aboutlink: Locator;
-  readonly bloglink: Locator;
+  readonly navigationMenuLink: Locator;
+  readonly homeLink: Locator;
+  readonly aboutLink: Locator;
+  readonly blogLink: Locator;
   readonly portfolio: Locator;
   readonly contact: Locator;
-  readonly Validationhead: Locator;
-  readonly Goback: Locator;
-
+  readonly validationHead: Locator;
+  readonly goBack: Locator;
   // Locators for Covered Elements
-  readonly gotoCoveredele: Locator;
-  readonly Coveredheadval: Locator;
+  readonly goToCoveredEle: Locator;
+  readonly coveredHeadVal: Locator;
   readonly coveredButton: Locator;
-
   // Locators for Hover Image
-  readonly hoverimagelink: Locator;
-  readonly hoverimage: Locator;
-  readonly hoverprice: Locator;
-
+  readonly hoverImageLink: Locator;
+  readonly hoverImage: Locator;
+  readonly hoverPrice: Locator;
   // Locators for File Upload
-  readonly fileuploadLink: Locator;
-  readonly fileupld: Locator;
-  readonly fileupldval: Locator;
-
+  readonly fileUploadLink: Locator;
+  readonly fileUpld: Locator;
+  readonly fileUpldVal: Locator;
   // Locators for Budget Tracker
-  readonly budgettrackerLink: Locator;
-  readonly NewentryButton: Locator;
-  readonly Rowforentry: (id: string) => Locator;
-
+  readonly budgetTrackerLink: Locator;
+  readonly newEntryButton: Locator;
+  readonly rowForEntry: (id: string) => Locator;
   // Locators for Right-Click Context Menu
-  readonly rightclickcontentLink: Locator;
-  readonly contextcontent: (menu: string) => Locator;
+  readonly rightClickContentLink: Locator;
+  readonly contextContent: (menu: string) => Locator;
   readonly contextVal: Locator;
-
   // Locators for Shadow DOM
   readonly shadowDomLink: Locator;
   readonly progressBar: Locator;
-
   // Locators for Slider
   readonly ratingSlider: Locator;
   readonly sliderVal: Locator;
-
   // Locator for Download File
   readonly downloadFileLink: Locator;
-
   private readonly sliderInput: Locator;
   private readonly sendFeedbackButton: Locator;
   readonly feedBack: Locator;
   readonly fileButton: Locator;
-
   readonly modalHeading: Locator;
   readonly closeIcon: Locator;
   readonly welcomeMessage: Locator;
- 
-
+  readonly fetchData: Locator;
+  readonly cardLocator: Locator;
+  readonly redirectHeader: Locator;
+  readonly redirectLink: Locator;
+  readonly messageLocators: Locator[];
+  readonly goBackButton: Locator;
   constructor(page: Page) {
     this.page = page;
 
     // Dynamic Table locators
-    this.Mainhead = page.locator('//span[text()="QA Playground"]');
-    this.DynamicTablelink = page.locator('//h3[text()="Dynamic Table"]');
+    this.mainHead = page.locator('//span[text()="QA Playground"]');
+    this.dynamicTableLink = page.locator('//h3[text()="Dynamic Table"]');
     this.spidermanName = page.locator('//div[text()="Spider-Man"]');
-    this.spiderealname = page.locator(
+    this.spideRealName = page.locator(
       '//div[text()="Spider-Man"]/ancestor::tr//span[contains(@class,"text-white-900")]'
     );
 
     // Verify Account locators
-    this.Verifyacclink = page.locator('//h3[text()="Verify Your Account"]');
-    this.Verifyhead = page.locator('//h2[text()="Verify Your Account"]');
-    this.successmesg = page.locator('//small[text()="Success"]');
+    this.verifyAccLink = page.locator('//h3[text()="Verify Your Account"]');
+    this.verifyHead = page.locator('//h2[text()="Verify Your Account"]');
+    this.successMsg = page.locator('//small[text()="Success"]');
 
     // Tags Input Box locators
-    this.Tagsinput = page.locator('//h3[text()="Tags Input Box"]');
-    this.Tagshead = page.locator('//h2[text()="Tags"]');
-    this.Inp = page.locator("//input");
-    this.countp = page.locator("//p/span");
+    this.tagsInput = page.locator('//h3[text()="Tags Input Box"]');
+    this.tagsHead = page.locator('//h2[text()="Tags"]');
+    this.inp = page.locator("//input");
+    this.countP = page.locator("//p/span");
     this.remov = (word: string) =>
       page.locator(`//li[normalize-space(text())='${word}']/i`);
 
     // New Tab locators
-    this.Newtab = page.locator('//h3[text()="New Tab"]');
-    this.opentabb = page.locator('//a[text()="Open New Tab"]');
-    this.newtabHead = page.locator('//h1[text()="Welcome to the new page!"]');
+    this.newTab = page.locator('//h3[text()="New Tab"]');
+    this.openTabB = page.locator('//a[text()="Open New Tab"]');
+    this.newTabHead = page.locator('//h1[text()="Welcome to the new page!"]');
 
     // Pop-Up locators
-    this.popuptab = page.locator('//h3[text()="Pop-Up Window"]');
-    this.Popup = page.locator('//a[text()="Open"]');
-    this.popedupb = page.locator('//button[text()="Submit"]');
-    this.popmesage = page.locator('//p[@id="info"]');
+    this.popUpTab = page.locator('//h3[text()="Pop-Up Window"]');
+    this.popUp = page.locator('//a[text()="Open"]');
+    this.popedUpB = page.locator('//button[text()="Submit"]');
+    this.popMesage = page.locator('//p[@id="info"]');
 
     // Nested Iframe locators
-    this.iframlink = page.locator('//h3[text()="Nested Iframe"]');
-    this.iframClickb = page.locator('//a[text()="Click Me"]');
-    this.iframval = page
+    this.iframeLink = page.locator('//h3[text()="Nested Iframe"]');
+    this.iframeClickB = page.locator('//a[text()="Click Me"]');
+    this.iframeVal = page
       .frameLocator("#frame1")
       .frameLocator("#frame2")
       .locator("#msg");
 
     // Navigation Menu locators
-    this.navigationmenulink = page.locator('//h3[text()="Navigation Menu"]');
-    this.homelink = page.locator('//a[text()="Home"]');
-    this.aboutlink = page.locator('//a[text()="About"]');
-    this.bloglink = page.locator('//a[text()="Blog"]');
+    this.navigationMenuLink = page.locator('//h3[text()="Navigation Menu"]');
+    this.homeLink = page.locator('//a[text()="Home"]');
+    this.aboutLink = page.locator('//a[text()="About"]');
+    this.blogLink = page.locator('//a[text()="Blog"]');
     this.portfolio = page.locator('//a[text()="Portfolio"]');
     this.contact = page.locator('//a[text()="Contact"]');
-    this.Validationhead = page.locator('//h1[@id="title"]');
-    this.Goback = page.locator('//a[text()="Go Back"]');
+    this.validationHead = page.locator('//h1[@id="title"]');
+    this.goBack = page.locator('//a[text()="Go Back"]');
 
     // Covered Elements locators
-    this.gotoCoveredele = page.locator('//h3[text()="Covered Elements"]');
-    this.Coveredheadval = page.locator('//div[@class="wrapper"]/p');
+    this.goToCoveredEle = page.locator('//h3[text()="Covered Elements"]');
+    this.coveredHeadVal = page.locator('//div[@class="wrapper"]/p');
     this.coveredButton = page.locator('//div[@class="wrapper"]/a');
 
     // Hover Image locators
-    this.hoverimagelink = page.locator('//h3[text()="Mouse Hover"]');
-    this.hoverimage = page.locator('//img[@class="poster"]');
-    this.hoverprice = page.locator('//p[@class="current-price"]');
+    this.hoverImageLink = page.locator('//h3[text()="Mouse Hover"]');
+    this.hoverImage = page.locator('//img[@class="poster"]');
+    this.hoverPrice = page.locator('//p[@class="current-price"]');
 
     // File Upload locators
-    this.fileuploadLink = page.locator('//h3[text()="Upload File"]');
-    this.fileupld = page.locator('//i[@class="fas fa-upload"]');
-    this.fileupldval = page.locator('//p[@id="num-of-files"]');
+    this.fileUploadLink = page.locator('//h3[text()="Upload File"]');
+    this.fileUpld = page.locator('//i[@class="fas fa-upload"]');
+    this.fileUpldVal = page.locator('//p[@id="num-of-files"]');
 
     // Budget Tracker locators
-    this.budgettrackerLink = page.locator('//h3[text()="Budget Tracker"]');
-    this.NewentryButton = page.locator('//button[text()="New Entry"]');
-    this.Rowforentry = (id: String) =>
+    this.budgetTrackerLink = page.locator('//h3[text()="Budget Tracker"]');
+    this.newEntryButton = page.locator('//button[text()="New Entry"]');
+    this.rowForEntry = (id: string) =>
       page.locator(`//table[@class="budget-tracker"]/tbody/tr[${id}]`);
 
     // Right-Click Context Menu locators
-    this.rightclickcontentLink = page.locator(
+    this.rightClickContentLink = page.locator(
       '//h3[text()="Right-Click Context Menu"]'
     );
-    this.contextcontent = (menu: string) =>
+    this.contextContent = (menu: string) =>
       page.locator(`//span[text()="${menu}"]`);
     this.contextVal = page.locator('//p[@id="msg"]');
 
@@ -199,17 +186,40 @@ export default class Playground {
 
     this.modalHeading = page.locator('//h3[text()="Onboarding Modal Popup"]');
     this.closeIcon = page.locator('//i[@class="fas fa-bars"]');
-    this.welcomeMessage = page.locator('div.title', { hasText: 'Welcome Peter Parker!' });
+    this.welcomeMessage = page.locator("div.title", {
+      hasText: "Welcome Peter Parker!",
+    });
+    this.fetchData = page.locator('//h3[text()="Fetching Data"]');
+    this.cardLocator = page.locator(".icard");
+
+    // Locator for the "Redirect Chain" header
+    this.redirectHeader = page.locator('//h3[text()="Redirect Chain"]');
+
+    // Locator for the redirect link
+    this.redirectLink = page.locator('//a[@id="redirect"]');
+
+    // Array of locators for messages displayed sequentially on each page
+    this.messageLocators = [
+      page.locator('//p[text()="Welcome to Second Page"]'),
+      page.locator('//p[text()="Welcome to Third Page"]'),
+      page.locator('//p[text()="Welcome to Fourth Page"]'),
+      page.locator('//p[text()="Welcome to Fifth Page"]'),
+      page.locator('//p[text()="Welcome to Sixth Page"]'),
+      page.locator('//p[text()="Welcome to the Last Page"]'),
+    ];
+
+    // Locator for the "Go Back" button on the last page
+    this.goBackButton = page.locator('//a[text()="Go Back"]');
   }
 
   /** Launch QA Playground website */
-  async Launchwebsite() {
+  async launchWebsite() {
     await this.page.goto("https://qaplayground.dev/#apps");
   }
 
   /** Navigate to Dynamic Table section */
-  async movetoDynamicTable() {
-    await this.DynamicTablelink.click();
+  async moveToDynamicTable() {
+    await this.dynamicTableLink.click();
   }
 
   /**
@@ -217,14 +227,14 @@ export default class Playground {
    * @param {string} expectedName - The name that should not match the actual superhero name.
    */
   async verifyIncorrectSuperheroName(expectedName: string) {
-    const actualName = await this.spiderealname.textContent();
-    expect(actualName?.trim()).not.toBe(expectedName);
+    const actualName = await this.spideRealName.textContent();
+    expect(actualName?.trim(),"Super hero real name doesnot match").not.toBe(expectedName);
   }
 
   /** Verify superhero name is NOT empty */
   async verifySuperheroNameIsEmpty() {
-    const actualName = await this.spiderealname.textContent();
-    expect(actualName?.trim()).not.toBe("");
+    const actualName = await this.spideRealName.textContent();
+    expect(actualName?.trim(),"Super hero name is empty").not.toBe("");
   }
 
   /**
@@ -232,86 +242,87 @@ export default class Playground {
    * @param {string} wrongPart - Substring that should not appear in the name.
    */
   async verifyPartialSuperheroName(wrongPart: string) {
-    const actualName = await this.spiderealname.textContent();
-    expect(actualName?.includes(wrongPart)).toBeFalsy();
+    const actualName = await this.spideRealName.textContent();
+    expect(actualName?.includes(wrongPart),"super hero name is not displayed").toBeFalsy();
   }
 
   /** Verify superhero name does NOT contain numbers */
   async verifySuperheroNameNoNumbers() {
-    const actualName = await this.spiderealname.textContent();
+    const actualName = await this.spideRealName.textContent();
     const regex = /\d/;
-    expect(regex.test(actualName || "")).toBeFalsy();
+    expect(regex.test(actualName || ""),"Super hero name is number").toBeFalsy();
   }
 
   /** Navigate to Verify Account section */
-  async movetoVerifyacc() {
-    await this.Verifyacclink.click();
+  async moveToVerifyAcc() {
+    await this.verifyAccLink.click();
   }
 
   /**
    * Enter code in Verify Account input fields
    * @param {string} number - The digit to enter in all verification fields.
    */
-  async enterdataNine(number: string) {
+  async enterDataNine(number: string) {
     const codeFields = this.page.locator(".code");
     for (let index = 0; index < (await codeFields.count()); index++) {
-      codeFields.nth(index).fill(number);
-      await expect(codeFields.nth(index)).toHaveValue(number);
+      await codeFields.nth(index).fill(number);
+      await expect(codeFields.nth(index),"Nine is not entered").toHaveValue(number);
     }
     await this.page.keyboard.press("Enter");
   }
 
   /** Navigate to Tags Input Box section */
-  async MovetoTags() {
-    this.Tagsinput.click();
+  async moveToTags() {
+    await this.tagsInput.click();
   }
 
   /** Enter multiple tags */
-async Enteratgs() {
-  // Get the path to the JSON file
-  const tagsFilePath = path.join(__dirname, "../DATA/tags.json");
+  async enterTags() {
+    // Get the path to the JSON file
+    const tagsFilePath = path.join(__dirname, "../DATA/tags.json");
 
-  // Read and parse the JSON file
-  const jsonData = JSON.parse(fs.readFileSync(tagsFilePath, "utf-8"));
-  const newTags: string[] = jsonData.tags;
+    // Read and parse the JSON file
+    const jsonData = JSON.parse(fs.readFileSync(tagsFilePath, "utf-8"));
+    const newTags: string[] = jsonData.tags;
 
-  // Fill and enter tags from JSON
-  for (let index = 0; index < newTags.length; index++) {
-    await this.Inp.fill(newTags[index]);
-    await this.Inp.click();
-    await this.page.keyboard.press("Enter");
+    // Fill and enter tags from JSON
+    for (let index = 0; index < newTags.length; index++) {
+      await this.inp.fill(newTags[index]);
+      await this.inp.click();
+      await this.page.keyboard.press("Enter");
+    }
   }
-}
+
   /**
    * Remove a specific tag
    * @param {string} word - The tag name to remove.
    */
-  async removetag(word: string) {
+  async removeTag(word: string) {
     await this.remov(word).click();
   }
 
   /** Navigate to New Tab section */
-  async navtonewtab() {
-    await this.Newtab.click();
+  async navToNewTab() {
+    await this.newTab.click();
   }
 
   /** Open new tab */
-  async clickonnewtab() {
-    await this.opentabb.click();
+  async clickOnNewTab() {
+    await this.openTabB.click();
   }
 
   /** Navigate to Pop-Up section */
-  async navgatetopop() {
-    await this.popuptab.click();
+  async navGateToPop() {
+    await this.popUpTab.click();
   }
 
   /** Open pop-up window */
-  async getpopup() {
-    await this.Popup.click();
+  async getPopUp() {
+    await this.popUp.click();
   }
 
   /** Submit pop-up */
-  async popedupsubmit() {
+  async popedUpSubmit() {
     const [popup] = await Promise.all([
       await this.page.waitForEvent("popup"),
       await this.page.locator("#login").click(),
@@ -320,103 +331,103 @@ async Enteratgs() {
   }
 
   /** Navigate to Nested Iframe section */
-  async gotoiframe() {
-    await this.iframlink.click();
+  async goToIframe() {
+    await this.iframeLink.click();
   }
 
   /** Click button inside nested iframe */
-  async clickiframeb() {
-    const Button = this.page
+  async clickIframeB() {
+    const button = this.page
       .frameLocator("#frame1")
       .frameLocator("#frame2")
       .locator("text=Click Me");
-    await Button.click();
+    await button.click();
   }
 
   /** Navigate to Navigation Menu section */
-  async Gotonavigationmenu() {
-    await this.navigationmenulink.click();
+  async gotoNavigationMenu() {
+    await this.navigationMenuLink.click();
   }
 
   /** Go to About link */
   async gotoAbout() {
-    await this.aboutlink.click();
+    await this.aboutLink.click();
   }
 
   /** Go to Blog link */
   async gotoBlog() {
-    await this.bloglink.click();
+    await this.blogLink.click();
   }
 
   /** Go to Contact link */
-  async gotocontact() {
+  async gotoContact() {
     await this.contact.click();
   }
 
   /** Go to Portfolio link */
-  async gotoportfolio() {
+  async gotoPortfolio() {
     await this.portfolio.click();
   }
 
   /** Go back from navigation menu */
-  async goBacknav() {
-    await this.Goback.click();
+  async goBackNav() {
+    await this.goBack.click();
   }
 
   /** Navigate to Covered Elements section */
-  async navtocoveredpage() {
-    await this.gotoCoveredele.click();
+  async navToCoveredPage() {
+    await this.goToCoveredEle.click();
   }
 
   /** Click the covered button */
-  async coveredButtonclick() {
+  async coveredButtonClick() {
     await this.coveredButton.click();
   }
 
   /** Navigate to Hover Image section */
-  async gotoHoverimage() {
-    this.hoverimagelink.click();
+  async gotoHoverImage() {
+    await this.hoverImageLink.click();
   }
 
   /** Hover over image */
-  async hoveroverimage() {
-    this.hoverimage.hover();
+  async hoverOverImage() {
+    await this.hoverImage.hover();
   }
 
   /** Navigate to File Upload section */
-  async fileuploadnavigation() {
-    this.fileuploadLink.click();
+  async fileUploadNavigation() {
+    await this.fileUploadLink.click();
   }
 
   /** Upload file and validate */
-  async fileuploading() {
+  async fileUploading() {
     const file = "Pages\\downloads\\info.txt";
     await this.page.setInputFiles("#file-input", file);
     await this.page.waitForTimeout(1000);
     const firstImageCaption = this.page.locator(
       "#images >> figure >> nth=0 >> figcaption"
     );
-    await expect(firstImageCaption).toContainText("info.txt");
+    await expect(firstImageCaption,"File name not info.txt").toContainText("info.txt");
   }
 
   /** Navigate to Budget Tracker section */
-  async navigatetobudgettracker() {
-    await this.budgettrackerLink.click();
+  async navigateToBudgetTracker() {
+    await this.budgetTrackerLink.click();
   }
 
   /** Add a new entry */
-  async addnewentery() {
-    await this.NewentryButton.click();
+  async addNewEntry() {
+    await this.newEntryButton.click();
   }
 
   /** Navigate to Right-Click Context Menu section */
-  async navtorightcontext() {
-    await this.rightclickcontentLink.click();
+  async navToRightContext() {
+    await this.rightClickContentLink.click();
     await this.page.waitForTimeout(500);
   }
 
   /** Perform right click */
-  async rightclick() {
+  async rightClick() {
     await this.page.mouse.click(964, 258, { button: "right" });
   }
 
@@ -424,20 +435,20 @@ async Enteratgs() {
    * Click on context menu item
    * @param {string} menu - The menu item to click.
    */
-  async MenuitemCLick(menu: string) {
-    await this.contextcontent(menu).click();
+  async menuItemClick(menu: string) {
+    await this.contextContent(menu).click();
   }
 
   /**
    * Hover on context menu item
    * @param {string} menu - The menu item to hover.
    */
-  async menuitemHover(menu: string) {
-    await this.contextcontent(menu).hover();
+  async menuItemHover(menu: string) {
+    await this.contextContent(menu).hover();
   }
 
   /** Navigate to Shadow DOM section */
-  async gotoshadowdom() {
+  async goToShadowDom() {
     await this.shadowDomLink.click();
   }
 
@@ -447,7 +458,7 @@ async Enteratgs() {
   }
 
   /** Navigate to Slider section */
-  async navigatetoSlider() {
+  async navigateToSlider() {
     await this.ratingSlider.click();
   }
 
@@ -469,7 +480,7 @@ async Enteratgs() {
   }
 
   /** Navigate to Download File section */
-  async navtodownloadfile() {
+  async navToDownloadFile() {
     await this.downloadFileLink.click();
   }
 
@@ -497,5 +508,63 @@ async Enteratgs() {
   async openModalPopupSection(): Promise<void> {
     await this.modalHeading.click();
     await this.closeIcon.click();
+  }
+
+  /**
+   * Opens the Fetch data section.
+   */
+  async launchFetchWebsite() {
+    await this.page.goto("https://qaplayground.dev/apps/fetch/", {
+      waitUntil: "networkidle",
+    });
+  }
+
+  /**
+   * Waits for the "Fetch Data" page to finish loading its API data and render post cards.
+   * It safely handles timing issues where the `/posts` API might load
+   * before the wait starts, preventing Playwright timeouts or page-close errors.
+   *
+   * @async
+   * @returns {Promise<number>} The total number of post cards rendered on the page.
+   */
+  async openFetchData() {
+    // Ensure the page network is idle first (most fetch requests are done)
+    await this.page.waitForLoadState("networkidle");
+
+    // Safely capture the /posts API response if it happens again
+    let postsResponse;
+    try {
+      postsResponse = await this.page.waitForResponse(
+        (resp) => resp.url().includes("/posts") && resp.ok(),
+        { timeout: 10000 } // prevent hanging forever
+      );
+    } catch (e) {
+      console.warn(
+        "⚠️ /posts API was likely already loaded before wait started."
+      );
+    }
+
+    // Wait until at least one card becomes visible
+    await this.cardLocator
+      .first()
+      .waitFor({ state: "visible", timeout: 15000 });
+
+    // (Optional) if postsResponse exists, validate JSON
+    if (postsResponse) {
+      const posts = await postsResponse.json();
+      expect(posts.length, "Posts length should be > 0").toBeGreaterThan(0);
+    }
+
+    // Return the total cards count
+    return await this.cardLocator.count();
+  }
+
+  async clickHeader(): Promise<void> {
+    await this.redirectHeader.click();
+  }
+
+  async clickRedirectLink(): Promise<void> {
+    await this.redirectLink.click();
+    await this.page.waitForTimeout(5000);
   }
 }

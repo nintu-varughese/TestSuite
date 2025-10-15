@@ -8,7 +8,7 @@ import * as XLSX from "xlsx";
  */
 export default class StaticTablePage {
   readonly page: Page;
-  projectDir = path.resolve(__dirname, ".."); // Project root
+  projectDir = path.resolve(__dirname, "../pgdownloads"); // Project root
 
   constructor(page: Page) {
     this.page = page;
@@ -19,6 +19,7 @@ export default class StaticTablePage {
   excelExportBtn = '//button[text()="📊 Export to Excel"]';
   tableRows = '//div[@class="overflow-x-auto"]//tbody/tr';
   tableHeaders = '//div[@class="overflow-x-auto"]//thead/tr/th';
+  exportPdfButton='//a[text()="📋 Export to PDF"]';
 
   /**
    * Navigates to the Static Table Export component page.
@@ -27,7 +28,7 @@ export default class StaticTablePage {
    */
   async goToStaticTablePage() {
     await this.page.click(this.componentsLink);
-    await expect(this.page).toHaveURL(/.*static-table-export/);
+    await expect(this.page,"wrong url displayed").toHaveURL(/.*static-table-export/);
   }
 
   /**
@@ -93,7 +94,7 @@ export default class StaticTablePage {
       h.toLowerCase().trim()
     );
     const pageHeaders = tableData.headers.map((h) => h.toLowerCase().trim());
-    expect(excelHeaders).toEqual(pageHeaders);
+    expect(excelHeaders,"Header data is not expected").toEqual(pageHeaders);
 
     // Normalize rows: convert all values to strings and format salary like page table
     const excelRows = excelJson.slice(1).map((row) =>
@@ -105,6 +106,6 @@ export default class StaticTablePage {
     );
 
     // Validate rows
-    expect(excelRows).toEqual(tableData.rows);
+    expect(excelRows,"Excel rows are not equal").toEqual(tableData.rows);
   }
 }

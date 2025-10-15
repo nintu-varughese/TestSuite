@@ -18,4 +18,5 @@ test.describe("Static Table Export Validations", () => {
     }
     await staticTablePage.validateExcel(excelPath, tableData);
   });
+  
 });

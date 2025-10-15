@@ -8,13 +8,16 @@ test("Add row and verify in exported Excel", async ({ page }) => {
   const tablePage = new DynamicTableExportPage(page);
   const downloadDir = path.resolve("./downloads");
   if (!fs.existsSync(downloadDir)) fs.mkdirSync(downloadDir);
+
   await tablePage.navigate();
+
   const rowData = {
     name: "New Item",
     category: "Electronics",
     price: "1200",
     stock: "10",
   };
+
   await tablePage.addRow(
     rowData.name,
     rowData.category,
@@ -23,7 +26,7 @@ test("Add row and verify in exported Excel", async ({ page }) => {
   );
   await tablePage.exportToExcel(downloadDir);
   const exportedFile = path.join(downloadDir, "exported_table.xlsx");
-  expect(fs.existsSync(exportedFile)).toBeTruthy();
+  expect(fs.existsSync(exportedFile),"Exported file is not found").toBeTruthy();
 
   // Read Excel content
   const workbook = XLSX.readFile(exportedFile);

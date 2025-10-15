@@ -10,7 +10,6 @@ export default class DynamicTableExportPage {
   readonly stockInp: Locator;
   readonly addButton: Locator;
   readonly excelButton: Locator;
-
   constructor(page: Page) {
     this.page = page;
     this.nameInp = page.locator('//input[@placeholder="Name"]');
@@ -60,7 +59,7 @@ export default class DynamicTableExportPage {
       this.page.waitForEvent("download"),
       this.excelButton.click(),
     ]);
-    const path = `${savePath}/exported_table.xlsx`;
-    await download.saveAs(path);
+    const filePath = `${savePath}/exported_table.xlsx`;
+    await download.saveAs(filePath);
   }
 }
