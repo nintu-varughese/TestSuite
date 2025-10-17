@@ -403,11 +403,11 @@ export default class Playground {
   async fileUploading() {
     const file = "Pages\\downloads\\info.txt";
     await this.page.setInputFiles("#file-input", file);
-    await this.page.waitForTimeout(1000);
+    //await this.page.waitForTimeout(1000);
     const firstImageCaption = this.page.locator(
       "#images >> figure >> nth=0 >> figcaption"
     );
-    await expect(firstImageCaption,"File name not info.txt").toContainText("info.txt");
+    await expect(firstImageCaption,"File name not info.txt").toHaveText("info.txt");
   }
 
   /** Navigate to Budget Tracker section */
@@ -423,12 +423,15 @@ export default class Playground {
   /** Navigate to Right-Click Context Menu section */
   async navToRightContext() {
     await this.rightClickContentLink.click();
-    await this.page.waitForTimeout(500);
+    //await this.contextVal.waitFor({ state: 'visible', timeout: 10000 });
+     await this.page.waitForLoadState("networkidle");
+   
   }
 
   /** Perform right click */
   async rightClick() {
     await this.page.mouse.click(964, 258, { button: "right" });
+   
   }
 
   /**
@@ -565,6 +568,6 @@ export default class Playground {
 
   async clickRedirectLink(): Promise<void> {
     await this.redirectLink.click();
-    await this.page.waitForTimeout(5000);
+ 
   }
 }

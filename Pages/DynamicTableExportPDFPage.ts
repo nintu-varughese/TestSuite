@@ -14,6 +14,12 @@ export default class DynamicTableExportPDFPage {
   readonly tableHeaders: Locator;
   readonly tableRows: Locator;
   downloadDir = path.resolve(__dirname, "../pgdownloads");
+
+  /**
+   * Initializes locators and ensures the download directory exists.
+   *
+   * @param {Page} page - Playwright Page object used for browser interactions.
+   */
   constructor(page: Page) {
     this.page = page;
     this.nameInp = page.locator('//input[@placeholder="Name"]');
@@ -22,7 +28,9 @@ export default class DynamicTableExportPDFPage {
     this.stockInp = page.locator('//input[@placeholder="Stock"]');
     this.addButton = page.locator('//button[contains(text(), "Add Row")]');
     this.pdfButton = page.locator('//a[text()="📋 Export to PDF"]');
-    this.tableHeaders = page.locator('//div[@class="overflow-x-auto"]//thead/tr/th');
+    this.tableHeaders = page.locator(
+      '//div[@class="overflow-x-auto"]//thead/tr/th'
+    );
     this.tableRows = page.locator('//div[@class="overflow-x-auto"]//tbody/tr');
 
     if (!fs.existsSync(this.downloadDir)) {
@@ -30,34 +38,70 @@ export default class DynamicTableExportPDFPage {
     }
   }
 
+  /**
+   * Navigates to the Dynamic Table Export page inside the Playground Components section.
+   *
+   * @returns {Promise<void>}
+   */
   async navigate() {
-    await this.page.goto("https://www.playground.testingmavens.tools/components");
-    await this.page.locator('//a[@href="/components/dynamic-table-export"]').click();
-    await expect(this.page,"Loaded url is not correct").toHaveURL(/.*dynamic-table-export/);
+    await this.page.goto(
+      "https://www.playground.testingmavens.tools/components"
+    );
+    await this.page
+      .locator('//a[@href="/components/dynamic-table-export"]')
+      .click();
+    await expect(this.page, "Loaded url is not correct").toHaveURL(
+      /.*dynamic-table-export/
+    );
   }
 
+  /**
+   * Adds a new row to the dynamic table.
+   *
+   * @param {string} name - The name of the item to add.
+   * @param {string} category - The category of the item.
+   * @param {string} price - The price of the item. Non-numeric characters will be removed before filling.
+   * @param {string} stock - The available stock quantity.
+   * @returns {Promise<void>}
+   */
   async addRow(name: string, category: string, price: string, stock: string) {
     await this.nameInp.fill(name);
     await this.categoryInp.fill(category);
-    // For input[type=number], price must be numeric string (remove $ or commas if present)
-    const numericPrice = price.replace(/[^0-9.]/g, "");
+    const numericPrice = price.replace(/[^0-9.]/g, ""); // Only numeric values allowed
     await this.priceInp.fill(numericPrice);
     await this.stockInp.fill(stock);
     await this.addButton.click();
   }
 
+  /**
+   * Extracts all table headers and rows currently rendered on the page.
+   *
+   * @returns {Promise<{ headers: string[], rows: string[][] }>}
+   * Structured table data with headers and row arrays.
+   */
   async getHeadersAndRows() {
-    const headers = await this.page.$$eval('//div[@class="overflow-x-auto"]//thead/tr/th', hs =>
-      hs.map(el => el.textContent?.trim() || "")
+    const headers = await this.page.$$eval(
+      '//div[@class="overflow-x-auto"]//thead/tr/th',
+      (hs) => hs.map((el) => el.textContent?.trim() || "")
     );
-    const rows = await this.page.$$eval('//div[@class="overflow-x-auto"]//tbody/tr', trs =>
-      trs.map(tr =>
-        Array.from(tr.querySelectorAll("td")).map(td => td.textContent?.trim() || "")
-      )
+    const rows = await this.page.$$eval(
+      '//div[@class="overflow-x-auto"]//tbody/tr',
+      (trs) =>
+        trs.map((tr) =>
+          Array.from(tr.querySelectorAll("td")).map(
+            (td) => td.textContent?.trim() || ""
+          )
+        )
     );
     return { headers, rows };
   }
 
+  /**
+   * Exports the table data to a downloadable PDF file.
+   *
+   * @returns {Promise<string>}
+   * The file path where the PDF was saved.
+   */
   async exportToPDF(): Promise<string> {
     const fileName = "dynamic_table_export.pdf";
     const filePath = path.join(this.downloadDir, fileName);
@@ -69,6 +113,13 @@ export default class DynamicTableExportPDFPage {
     return filePath;
   }
 
+  /**
+   * Reads and extracts text from the provided PDF file using PdfReader.
+   *
+   * @param {string} pdfPath - Path to the exported PDF file.
+   * @returns {Promise<string>}
+   * Extracted text content of the PDF file.
+   */
   async extractPdfText(pdfPath: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const results: string[] = [];
@@ -80,26 +131,50 @@ export default class DynamicTableExportPDFPage {
     });
   }
 
-  async validateAllTableDataPDF(pdfPath: string, tableData: { headers: string[], rows: string[][] }) {
-    if (!fs.existsSync(pdfPath)) throw new Error(`PDF file not found at path: ${pdfPath}`);
+  /**
+   * Validates that all table headers and cell values match the text content of the exported PDF.
+   *
+   * @param {string} pdfPath - Path to the saved PDF file for validation.
+   * @param {{ headers: string[], rows: string[][] }} tableData - Table data extracted from the webpage.
+   *
+   * @throws {Error} If any table cell or header (excluding "Actions") is not found in the PDF text.
+   * @returns {Promise<void>}
+   */
+  async validateAllTableDataPDF(
+    pdfPath: string,
+    tableData: { headers: string[]; rows: string[][] }
+  ) {
+    if (!fs.existsSync(pdfPath))
+      throw new Error(`PDF file not found at path: ${pdfPath}`);
     const pdfText = await this.extractPdfText(pdfPath);
-    const normPdf = pdfText.replace(/[\$,]/g, "").replace(/\s+/g, "").toLowerCase();
+    const normPdf = pdfText
+      .replace(/[\$,]/g, "")
+      .replace(/\s+/g, "")
+      .toLowerCase();
 
-    // Skip "Actions" column as it is not in the PDF export
+    // Skip "Actions" column as it is not part of PDF exports
     const excludedHeaders = ["actions"];
 
+    // Validate table headers
     for (const header of tableData.headers) {
-      const normHeader = header.replace(/[\$,]/g, "").replace(/\s+/g, "").toLowerCase();
+      const normHeader = header
+        .replace(/[\$,]/g, "")
+        .replace(/\s+/g, "")
+        .toLowerCase();
       if (excludedHeaders.includes(normHeader)) continue;
       if (!normPdf.includes(normHeader)) {
         throw new Error(`Header "${header}" not found in PDF`);
       }
     }
 
+    // Validate row cell values
     for (const row of tableData.rows) {
-      // Skip last cell assuming it is "Actions"
       for (const cell of row.slice(0, -1)) {
-        const normCell = cell.replace(/[\$,]/g, "").replace(/\s+/g, "").toLowerCase();
+        // Excluding “Actions” cell
+        const normCell = cell
+          .replace(/[\$,]/g, "")
+          .replace(/\s+/g, "")
+          .toLowerCase();
         if (!normPdf.includes(normCell)) {
           throw new Error(`Cell value "${cell}" not found in PDF`);
         }

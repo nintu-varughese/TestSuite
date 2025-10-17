@@ -1,17 +1,25 @@
 import { test, expect } from "../Pages/fixture";
 import user1 from "../DATA/user.json";
 
-test.describe("File download,upload ", () => {
+test.describe("Validate through email if the user is registered", () => {
   test("Register and verify email on Screener.in using YOPmail", async ({
-    page,
     context,
     scre,
   }) => {
     const yopEmail = user1.user1[0].User;
     const password = user1.user1[0].Password;
-    await scre.launchWebsite();
-    await scre.gotoRegistration();
-    await scre.register(yopEmail, password);
-    await scre.verifyEmailFromYopmail(context, yopEmail);
+
+    await test.step("Launch Screener.in website and navigate to registration page", async () => {
+      await scre.launchWebsite();
+      await scre.gotoRegistration();
+    });
+
+    await test.step("Register user with provided email and password", async () => {
+      await scre.register(yopEmail, password);
+    });
+
+    await test.step("Verify registration email received on YOPmail", async () => {
+      await scre.verifyEmailFromYopmail(context, yopEmail);
+    });
   });
 });

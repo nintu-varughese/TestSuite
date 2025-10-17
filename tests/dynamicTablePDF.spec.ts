@@ -1,21 +1,37 @@
-import { test, expect } from "@playwright/test";
-import DynamicTableExportPDFPage from "../Pages/DynamicTableExportPDFPage";
+import { test, expect } from "../Pages/fixture";
 import fs from "fs";
 import path from "path";
 
-test("Add row and validate all table data in exported PDF", async ({ page }) => {
-  const pdfPage = new DynamicTableExportPDFPage(page);
+test("Add row and validate all table data in exported PDF", async ({
+  pdfPage,
+}) => {
   const downloadDir = path.resolve("./pgdownloads");
-  if (!fs.existsSync(downloadDir)) fs.mkdirSync(downloadDir);
 
-  await pdfPage.navigate();
+  let tableData: any;
+  let pdfPath: any;
 
-  await pdfPage.addRow("Row PDF Test", "Books", "11.99", "7");
+  await test.step("Ensure download directory exists", async () => {
+    if (!fs.existsSync(downloadDir)) fs.mkdirSync(downloadDir);
+  });
 
-  const tableData = await pdfPage.getHeadersAndRows();
+  await test.step("Navigate to PDF page", async () => {
+    await pdfPage.navigate();
+  });
 
-  const pdfPath = await pdfPage.exportToPDF();
-  expect(fs.existsSync(pdfPath),"Pdf path doesnot exist").toBeTruthy();
+  await test.step("Add a new row with specific data", async () => {
+    await pdfPage.addRow("Row PDF Test", "Books", "11.99", "7");
+  });
 
-  await pdfPage.validateAllTableDataPDF(pdfPath, tableData);
+  await test.step("Get all headers and rows from the table", async () => {
+    tableData = await pdfPage.getHeadersAndRows();
+  });
+
+  await test.step("Export the table data to PDF and validate the path", async () => {
+    pdfPath = await pdfPage.exportToPDF();
+    expect(fs.existsSync(pdfPath), "Pdf path does not exist").toBeTruthy();
+  });
+
+  await test.step("Validate all table data inside the exported PDF", async () => {
+    await pdfPage.validateAllTableDataPDF(pdfPath, tableData);
+  });
 });
