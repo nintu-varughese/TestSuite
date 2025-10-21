@@ -1,5 +1,5 @@
-import { test, expect } from "../Pages/fixture";
-import fs from "fs";
+import { test, expect,fs } from "../Pages/fixture";
+
 
 test.describe("Static Table Export PDF Validations", () => {
   test.beforeEach(async ({ pdfPageE, page }) => {

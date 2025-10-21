@@ -494,12 +494,11 @@ export default class Playground {
       this.fileButton.click(),
     ]);
 
-    const filePath = path.resolve(
-      __dirname,
-      "..",
-      "testd",
-      await download.suggestedFilename()
-    );
+   const filePath = path.resolve(
+    process.cwd(),
+    ".artifacts",
+    await download.suggestedFilename()
+  );
     await download.saveAs(filePath);
     expect(fs.existsSync(filePath), "file name to be true").toBeTruthy();
     expect(path.extname(filePath), "Expect file to be pdf").toBe(".pdf");

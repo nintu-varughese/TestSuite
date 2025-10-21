@@ -1,11 +1,10 @@
-import { test, expect } from "../Pages/fixture";
-import fs from "fs";
-import path from "path";
+import { test, expect,fs,path } from "../Pages/fixture";
 
+test.describe("Dynamic table pdf download and validation", () => {
 test("Add row and validate all table data in exported PDF", async ({
   pdfPage,
 }) => {
-  const downloadDir = path.resolve("./pgdownloads");
+  const downloadDir = path.resolve("./.artifacts/pgdownloads");
 
   let tableData: any;
   let pdfPath: any;
@@ -34,4 +33,5 @@ test("Add row and validate all table data in exported PDF", async ({
   await test.step("Validate all table data inside the exported PDF", async () => {
     await pdfPage.validateAllTableDataPDF(pdfPath, tableData);
   });
+});
 });

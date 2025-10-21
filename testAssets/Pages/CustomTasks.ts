@@ -130,7 +130,7 @@ export default class CustomTask {
       this.page.waitForEvent("download"),
       this.downloadButton.click(),
     ]);
-    const filePath = path.resolve(__dirname, "..", "testdata", await download.suggestedFilename());
+    const filePath = path.resolve(__dirname, "..", ".artifacts", await download.suggestedFilename());
     await download.saveAs(filePath);
     expect(fs.existsSync(filePath)).toBeTruthy();
     expect(path.extname(filePath)).toBe(".txt");
@@ -150,7 +150,7 @@ export default class CustomTask {
    */
   async uploadFile() {
     const fileInput = this.uploadInput;
-    await fileInput.setInputFiles("Pages\\downloads\\info.txt");
+    await fileInput.setInputFiles("testData\\downloadtxt\\info.txt");
   }
 
   /**

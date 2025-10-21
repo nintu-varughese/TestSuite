@@ -5,7 +5,7 @@ import { PdfReader } from "pdfreader";
 
 export default class StaticTablePDFPage {
   readonly page: Page;
-  downloadDir = path.resolve(__dirname, "../pgdownloads");
+  downloadDir = path.resolve(process.cwd(), ".artifacts/pgdownloads");
   exportPdfButton = '//a[text()="📋 Export to PDF"]';
   tableHeaders = '//div[@class="overflow-x-auto"]//thead/tr/th';
   tableRows = '//div[@class="overflow-x-auto"]//tbody/tr';
@@ -54,16 +54,24 @@ export default class StaticTablePDFPage {
    * Downloads the exported PDF file and returns its file path.
    * @returns {Promise<string>} The path to the saved PDF file.
    */
-  async downloadPDF(): Promise<string> {
-    const fileName = "static_employee_data.pdf";
-    const filePath = path.join(this.downloadDir, fileName);
-    const [download] = await Promise.all([
-      this.page.waitForEvent("download"),
-      this.page.click(this.exportPdfButton),
-    ]);
-    await download.saveAs(filePath);
-    return filePath;
-  }
+async downloadPDF(): Promise<string> {
+  const fileName = "static_employee_data.pdf";
+  // Make sure artifacts folder path is resolved to project root
+  const artifactsDir = path.resolve(process.cwd(), ".artifacts");
+  const filePath = path.join(artifactsDir, fileName);
+
+  // Ensure the .artifacts folder exists
+  const fs = await import("fs/promises");
+  await fs.mkdir(artifactsDir, { recursive: true });
+
+  const [download] = await Promise.all([
+    this.page.waitForEvent("download"),
+    this.page.click(this.exportPdfButton),
+  ]);
+
+  await download.saveAs(filePath);
+  return filePath;
+}
 
   /**
    * Extracts text content from a PDF file.

@@ -1,12 +1,11 @@
-import { test, expect } from "../Pages/fixture";
-import * as path from "path";
-import * as fs from "fs";
-import * as XLSX from "xlsx";
+import { test, expect,fs,path,XLSX} from "../Pages/fixture";
 
+
+test.describe("Dynamic table excel download and validation", () => {
 test("Add row and validate all table data in exported excel", async ({
   tablePage,
 }) => {
-  const downloadDir = path.resolve("./downloads");
+  const downloadDir = path.resolve("./.artifacts/downloads");
 
   await test.step("Ensure download directory exists", async () => {
     if (!fs.existsSync(downloadDir)) fs.mkdirSync(downloadDir);
@@ -62,4 +61,5 @@ test("Add row and validate all table data in exported excel", async ({
       "Expected added row to appear in Excel export"
     ).toBeTruthy();
   });
+});
 });

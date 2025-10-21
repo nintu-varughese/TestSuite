@@ -12,14 +12,15 @@ export default class DynamicTableExportPDFPage {
   readonly addButton: Locator;
   readonly pdfButton: Locator;
   readonly tableHeaders: Locator;
-  readonly tableRows: Locator;
-  downloadDir = path.resolve(__dirname, "../pgdownloads");
+  readonly tableRows: Locator; // UPDATED to save downloads inside .artifacts folder at project root
 
+  downloadDir = path.resolve(process.cwd(), ".artifacts/pgdownloads");
   /**
    * Initializes locators and ensures the download directory exists.
    *
    * @param {Page} page - Playwright Page object used for browser interactions.
    */
+
   constructor(page: Page) {
     this.page = page;
     this.nameInp = page.locator('//input[@placeholder="Name"]');
@@ -37,12 +38,12 @@ export default class DynamicTableExportPDFPage {
       fs.mkdirSync(this.downloadDir, { recursive: true });
     }
   }
-
   /**
    * Navigates to the Dynamic Table Export page inside the Playground Components section.
    *
    * @returns {Promise<void>}
    */
+
   async navigate() {
     await this.page.goto(
       "https://www.playground.testingmavens.tools/components"
@@ -54,7 +55,6 @@ export default class DynamicTableExportPDFPage {
       /.*dynamic-table-export/
     );
   }
-
   /**
    * Adds a new row to the dynamic table.
    *
@@ -64,6 +64,7 @@ export default class DynamicTableExportPDFPage {
    * @param {string} stock - The available stock quantity.
    * @returns {Promise<void>}
    */
+
   async addRow(name: string, category: string, price: string, stock: string) {
     await this.nameInp.fill(name);
     await this.categoryInp.fill(category);
@@ -72,13 +73,13 @@ export default class DynamicTableExportPDFPage {
     await this.stockInp.fill(stock);
     await this.addButton.click();
   }
-
   /**
    * Extracts all table headers and rows currently rendered on the page.
    *
    * @returns {Promise<{ headers: string[], rows: string[][] }>}
    * Structured table data with headers and row arrays.
    */
+
   async getHeadersAndRows() {
     const headers = await this.page.$$eval(
       '//div[@class="overflow-x-auto"]//thead/tr/th',
@@ -95,13 +96,13 @@ export default class DynamicTableExportPDFPage {
     );
     return { headers, rows };
   }
-
   /**
    * Exports the table data to a downloadable PDF file.
    *
    * @returns {Promise<string>}
    * The file path where the PDF was saved.
    */
+
   async exportToPDF(): Promise<string> {
     const fileName = "dynamic_table_export.pdf";
     const filePath = path.join(this.downloadDir, fileName);
@@ -112,7 +113,6 @@ export default class DynamicTableExportPDFPage {
     await download.saveAs(filePath);
     return filePath;
   }
-
   /**
    * Reads and extracts text from the provided PDF file using PdfReader.
    *
@@ -120,6 +120,7 @@ export default class DynamicTableExportPDFPage {
    * @returns {Promise<string>}
    * Extracted text content of the PDF file.
    */
+
   async extractPdfText(pdfPath: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const results: string[] = [];
@@ -130,7 +131,6 @@ export default class DynamicTableExportPDFPage {
       });
     });
   }
-
   /**
    * Validates that all table headers and cell values match the text content of the exported PDF.
    *
@@ -140,6 +140,7 @@ export default class DynamicTableExportPDFPage {
    * @throws {Error} If any table cell or header (excluding "Actions") is not found in the PDF text.
    * @returns {Promise<void>}
    */
+
   async validateAllTableDataPDF(
     pdfPath: string,
     tableData: { headers: string[]; rows: string[][] }
@@ -150,12 +151,10 @@ export default class DynamicTableExportPDFPage {
     const normPdf = pdfText
       .replace(/[\$,]/g, "")
       .replace(/\s+/g, "")
-      .toLowerCase();
+      .toLowerCase(); // Skip "Actions" column as it is not part of PDF exports
 
-    // Skip "Actions" column as it is not part of PDF exports
-    const excludedHeaders = ["actions"];
+    const excludedHeaders = ["actions"]; // Validate table headers
 
-    // Validate table headers
     for (const header of tableData.headers) {
       const normHeader = header
         .replace(/[\$,]/g, "")
@@ -165,9 +164,8 @@ export default class DynamicTableExportPDFPage {
       if (!normPdf.includes(normHeader)) {
         throw new Error(`Header "${header}" not found in PDF`);
       }
-    }
+    } // Validate row cell values
 
-    // Validate row cell values
     for (const row of tableData.rows) {
       for (const cell of row.slice(0, -1)) {
         // Excluding “Actions” cell

@@ -7,6 +7,9 @@ import DynamicTableExportPDFPage from "./DynamicTableExportPDFPage";
 import StaticTablePDFPage from "./StaticTablePDFPage";
 import StaticTablePage from "./staticPage";
 import DynamicTableExportPage from "./dynamicPage";
+import fs from "fs";
+import path from "path";
+import * as XLSX from "xlsx";
 
 type MyFixtures = {
   custom: custom;
@@ -50,4 +53,4 @@ const test = base.extend<MyFixtures>({
   }
 });
 
-export { test, expect };
+export { test, expect,fs,path,XLSX};

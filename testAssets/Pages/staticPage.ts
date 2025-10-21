@@ -8,7 +8,9 @@ import * as XLSX from "xlsx";
  */
 export default class StaticTablePage {
   readonly page: Page;
-  projectDir = path.resolve(__dirname, "../pgdownloads"); // Project root
+
+  // Use artifacts folder for downloads
+  artifactsDir = path.resolve(process.cwd(), ".artifacts");
 
   constructor(page: Page) {
     this.page = page;
@@ -19,28 +21,17 @@ export default class StaticTablePage {
   excelExportBtn = '//button[text()="📊 Export to Excel"]';
   tableRows = '//div[@class="overflow-x-auto"]//tbody/tr';
   tableHeaders = '//div[@class="overflow-x-auto"]//thead/tr/th';
-  exportPdfButton='//a[text()="📋 Export to PDF"]';
+  exportPdfButton = '//a[text()="📋 Export to PDF"]';
 
-  /**
-   * Navigates to the Static Table Export component page.
-   * @async
-   * @throws {Error} If the URL does not match the expected route.
-   */
   async goToStaticTablePage() {
     await this.page.click(this.componentsLink);
-    await expect(this.page,"wrong url displayed").toHaveURL(/.*static-table-export/);
+    await expect(this.page, "wrong url displayed").toHaveURL(/.*static-table-export/);
   }
 
-  /**
-   * Extracts table data (headers and rows) from the page.
-   * @async
-   * @returns {Promise<{headers: string[], rows: string[][]}>} An object containing table headers and row data.
-   */
   async getTableData() {
     const headers = await this.page.$$eval(this.tableHeaders, (th) =>
       th.map((el) => el.textContent?.trim())
     );
-
     const rows = await this.page.$$eval(this.tableRows, (trs) =>
       trs.map((tr) =>
         Array.from(tr.querySelectorAll("td")).map((td) =>
@@ -48,18 +39,16 @@ export default class StaticTablePage {
         )
       )
     );
-
     return { headers, rows };
   }
 
-  /**
-   * Downloads the exported Excel file to the project directory.
-   * @async
-   * @returns {Promise<string>} The full path of the downloaded Excel file.
-   */
   async downloadExcel(): Promise<string> {
     const downloadFileName = "static_employee_data.xlsx";
-    const downloadPath = path.join(this.projectDir, downloadFileName);
+    // Ensure artifacts directory exists
+    const fs = await import("fs/promises");
+    await fs.mkdir(this.artifactsDir, { recursive: true });
+
+    const downloadPath = path.join(this.artifactsDir, downloadFileName);
 
     const [download] = await Promise.all([
       this.page.waitForEvent("download"),
@@ -70,13 +59,6 @@ export default class StaticTablePage {
     return downloadPath;
   }
 
-  /**
-   * Validates the downloaded Excel file content against the table data on the page.
-   * @async
-   * @param {string} pathToExcel - The path to the downloaded Excel file.
-   * @param {{ headers: string[], rows: string[][] }} tableData - The table data captured from the webpage.
-   * @throws {Error} If Excel headers or rows do not match the page table data.
-   */
   async validateExcel(
     pathToExcel: string,
     tableData: { headers: string[]; rows: string[][] }
@@ -94,7 +76,7 @@ export default class StaticTablePage {
       h.toLowerCase().trim()
     );
     const pageHeaders = tableData.headers.map((h) => h.toLowerCase().trim());
-    expect(excelHeaders,"Header data is not expected").toEqual(pageHeaders);
+    expect(excelHeaders, "Header data is not expected").toEqual(pageHeaders);
 
     // Normalize rows: convert all values to strings and format salary like page table
     const excelRows = excelJson.slice(1).map((row) =>
@@ -106,6 +88,6 @@ export default class StaticTablePage {
     );
 
     // Validate rows
-    expect(excelRows,"Excel rows are not equal").toEqual(tableData.rows);
+    expect(excelRows, "Excel rows are not equal").toEqual(tableData.rows);
   }
 }
