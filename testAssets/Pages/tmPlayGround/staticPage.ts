@@ -10,7 +10,7 @@ export default class StaticTablePage {
   readonly page: Page;
 
   // Use artifacts folder for downloads
-  artifactsDir = path.resolve(process.cwd(), ".artifacts");
+  artifactsDir = path.resolve(process.cwd(), ".artifacts/downloads");
 
   constructor(page: Page) {
     this.page = page;

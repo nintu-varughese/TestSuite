@@ -14,7 +14,7 @@ export default class DynamicTableExportPDFPage {
   readonly tableHeaders: Locator;
   readonly tableRows: Locator; // UPDATED to save downloads inside .artifacts folder at project root
 
-  downloadDir = path.resolve(process.cwd(), ".artifacts/pgdownloads");
+  downloadDir = path.resolve(process.cwd(), ".artifacts/downloads");
   /**
    * Initializes locators and ensures the download directory exists.
    *

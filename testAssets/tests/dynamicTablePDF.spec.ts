@@ -4,14 +4,14 @@ test.describe("Dynamic table pdf download and validation", () => {
 test("Add row and validate all table data in exported PDF", async ({
   pdfPage,
 }) => {
-  const downloadDir = path.resolve("./.artifacts/pgdownloads");
+  //const downloadDir = path.resolve("./.artifacts/downloads");
 
   let tableData: any;
   let pdfPath: any;
 
-  await test.step("Ensure download directory exists", async () => {
-    if (!fs.existsSync(downloadDir)) fs.mkdirSync(downloadDir);
-  });
+  // await test.step("Ensure download directory exists", async () => {
+  //   if (!fs.existsSync(downloadDir)) fs.mkdirSync(downloadDir);
+  // });
 
   await test.step("Navigate to PDF page", async () => {
     await pdfPage.navigate();

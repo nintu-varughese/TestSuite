@@ -3,8 +3,6 @@ import path from 'path';
 
 export default defineConfig({
   globalSetup: path.resolve(__dirname, 'global-setup.ts'),
-  // ...rest of your config
-
 
 /**
  * Read environment variables from file.
@@ -49,7 +47,7 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'on', // Attach screenshots automatically
     video: 'on',
-    headless: false
+    headless: true
   },
 
   /* Configure projects for major browsers */
@@ -68,4 +66,6 @@ export default defineConfig({
   //   url: 'http://localhost:3000',
   //   reuseExistingServer: !process.env.CI,
   // },
+
+
 });

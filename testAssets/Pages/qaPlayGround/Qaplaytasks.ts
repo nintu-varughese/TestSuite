@@ -401,7 +401,7 @@ export default class Playground {
 
   /** Upload file and validate */
   async fileUploading() {
-    const file = "Pages\\downloads\\info.txt";
+    const file = "testAssets/testData/downloadtxt/info.txt";
     await this.page.setInputFiles("#file-input", file);
     //await this.page.waitForTimeout(1000);
     const firstImageCaption = this.page.locator(
@@ -496,7 +496,7 @@ export default class Playground {
 
    const filePath = path.resolve(
     process.cwd(),
-    ".artifacts",
+    ".artifacts/downloads",
     await download.suggestedFilename()
   );
     await download.saveAs(filePath);
