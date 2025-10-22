@@ -2,10 +2,12 @@ import { Page, expect } from "@playwright/test";
 import fs from "fs";
 import path from "path";
 import { PdfReader } from "pdfreader";
+import { DownloadHelper } from "../../../helpers/downloadFile";
 
 export default class StaticTablePDFPage {
   readonly page: Page;
-  downloadDir = path.resolve(process.cwd(), ".artifacts/pgdownloads");
+  private downloadHelper: DownloadHelper;
+ // downloadDir = path.resolve(process.cwd(), ".artifacts/pgdownloads");
   exportPdfButton = '//a[text()="📋 Export to PDF"]';
   tableHeaders = '//div[@class="overflow-x-auto"]//thead/tr/th';
   tableRows = '//div[@class="overflow-x-auto"]//tbody/tr';
@@ -16,9 +18,7 @@ export default class StaticTablePDFPage {
    */
   constructor(page: Page) {
     this.page = page;
-    if (!fs.existsSync(this.downloadDir)) {
-      fs.mkdirSync(this.downloadDir, { recursive: true });
-    }
+    this.downloadHelper = new DownloadHelper(page);
   }
 
   /**
@@ -55,23 +55,11 @@ export default class StaticTablePDFPage {
    * @returns {Promise<string>} The path to the saved PDF file.
    */
 async downloadPDF(): Promise<string> {
-  const fileName = "static_employee_data.pdf";
-  // Make sure artifacts folder path is resolved to project root
-  const artifactsDir = path.resolve(process.cwd(), ".artifacts/downloads");
-  const filePath = path.join(artifactsDir, fileName);
-
-  // Ensure the .artifacts folder exists
-  const fs = await import("fs/promises");
-  await fs.mkdir(artifactsDir, { recursive: true });
-
-  const [download] = await Promise.all([
-    this.page.waitForEvent("download"),
-    this.page.click(this.exportPdfButton),
-  ]);
-
-  await download.saveAs(filePath);
-  return filePath;
-}
+    return await this.downloadHelper.downloadFile(
+      this.page.locator(this.exportPdfButton),
+      "static_employee_data.pdf"
+    );
+  }
 
   /**
    * Extracts text content from a PDF file.

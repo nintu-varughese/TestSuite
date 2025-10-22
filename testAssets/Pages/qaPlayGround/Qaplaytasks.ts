@@ -2,10 +2,11 @@ import { Page, expect, Locator } from "@playwright/test";
 import { SrvRecord } from "dns";
 import path from "path";
 import fs from "fs";
-
+import { UploadHelper } from "../../../helpers/uploadFile";
 export default class Playground {
   // Page reference
   readonly page: Page;
+  private uploadHelper: UploadHelper;
   // Locators for Dynamic Table
   readonly mainHead: Locator;
   readonly dynamicTableLink: Locator;
@@ -86,6 +87,7 @@ export default class Playground {
   readonly goBackButton: Locator;
   constructor(page: Page) {
     this.page = page;
+    this.uploadHelper = new UploadHelper(page);
 
     // Dynamic Table locators
     this.mainHead = page.locator('//span[text()="QA Playground"]');
@@ -399,16 +401,15 @@ export default class Playground {
     await this.fileUploadLink.click();
   }
 
-  /** Upload file and validate */
-  async fileUploading() {
-    const file = "testAssets/testData/downloadtxt/info.txt";
-    await this.page.setInputFiles("#file-input", file);
-    //await this.page.waitForTimeout(1000);
-    const firstImageCaption = this.page.locator(
-      "#images >> figure >> nth=0 >> figcaption"
-    );
-    await expect(firstImageCaption,"File name not info.txt").toHaveText("info.txt");
-  }
+  async fileUploading(filePath: string) {
+  const fileInputLocator = this.page.locator("#file-input");
+  await this.uploadHelper.uploadFile(fileInputLocator, filePath);
+  
+  const firstImageCaption = this.page.locator(
+    "#images >> figure >> nth=0 >> figcaption"
+  );
+  await expect(firstImageCaption, "File name not info.txt").toHaveText("info.txt");
+}
 
   /** Navigate to Budget Tracker section */
   async navigateToBudgetTracker() {

@@ -289,22 +289,22 @@ test.describe("QA PLAYGROUND SITE DEMO FUNCTIONALITIES", () => {
   });
 
   test("Upload an image file and verify the file name is displayed", async ({
-    playg,
-  }) => {
-    await test.step("Launch website and navigate to file upload section", async () => {
-      await playg.launchWebsite();
-      await playg.fileUploadNavigation();
-    });
-
-    await test.step("Upload file and verify uploaded file count", async () => {
-      await playg.fileUploading();
-      await expect(
-        playg.fileUpldVal,
-        "Uploaded file count should be displayed"
-      ).toContainText("1");
-    });
+  playg,
+}) => {
+  await test.step("Launch website and navigate to file upload section", async () => {
+    await playg.launchWebsite();
+    await playg.fileUploadNavigation();
   });
 
+  await test.step("Upload file and verify uploaded file count", async () => {
+    const filePath = "testAssets/testData/downloadtxt/info.txt";
+    await playg.fileUploading(filePath);
+    await expect(
+      playg.fileUpldVal,
+      "Uploaded file count should be displayed"
+    ).toContainText("1");
+  });
+});
   test("Click on each menu and sub-menu item and assert the message displayed", async ({
     playg,
   }) => {
