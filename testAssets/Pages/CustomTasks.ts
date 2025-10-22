@@ -2,6 +2,8 @@ import { Locator, Page, expect } from "@playwright/test";
 import fs from "fs";
 import path from "path";
 import { PdfReader } from "pdfreader";
+import { UploadHelper } from "../../helpers/uploadFile";
+import { DownloadHelper } from "../../helpers/downloadFile";
 
 /**
  * CustomTask class automates various user interactions
@@ -10,6 +12,8 @@ import { PdfReader } from "pdfreader";
  */
 export default class CustomTask {
   readonly page: Page;
+  private uploadHelper: UploadHelper;
+  private downloadHelper: DownloadHelper;
 
   // Locators for different UI elements across pages
   readonly moreLink: Locator;
@@ -45,6 +49,8 @@ export default class CustomTask {
    */
   constructor(page: Page) {
     this.page = page;
+    this.uploadHelper = new UploadHelper(page);
+    this.downloadHelper = new DownloadHelper(page);
     // Menu and navigation elements
     this.moreLink = page.locator('//a[text()="More"]');
     this.downloadPage = page.locator('//a[text()="File Download"]');
@@ -80,7 +86,7 @@ export default class CustomTask {
     this.staticPage = page.locator('//a[text()="Static "]');
   }
 
-  /**
+   /**
    * Launches the Automation Demo website.
    * Navigates directly to the Static page for interactions.
    */
@@ -126,16 +132,23 @@ export default class CustomTask {
    * - File contains expected content
    */
   async downloadFile() {
-    const [download] = await Promise.all([
-      this.page.waitForEvent("download"),
-      this.downloadButton.click(),
-    ]);
-    const filePath = path.resolve(__dirname, "..", ".artifacts", await download.suggestedFilename());
-    await download.saveAs(filePath);
+    const filePath = await this.downloadHelper.downloadFileWithSuggestedName(
+      this.downloadButton,
+      30000 // 30 second timeout
+    );
+    
+    // Import fs for validation
+    const fs = await import("fs");
+    
+    // Validate file properties
     expect(fs.existsSync(filePath)).toBeTruthy();
     expect(path.extname(filePath)).toBe(".txt");
+    
+    // Validate file content
     const fileContent = fs.readFileSync(filePath, "utf-8").trim();
     expect(fileContent, "Name is not Batman").toBe("Hi i am Batman");
+    
+    return filePath;
   }
 
   /**
@@ -147,10 +160,28 @@ export default class CustomTask {
 
   /**
    * Uploads a file (`info.txt`) from the local test data directory.
+   * Maintains backward compatibility with existing tests.
    */
-  async uploadFile() {
-    const fileInput = this.uploadInput;
-    await fileInput.setInputFiles("testData\\downloadtxt\\info.txt");
+  async uploadFile(path: any) {
+    const filePath = path;
+    await this.uploadHelper.uploadFile(
+      this.uploadInput,
+      filePath,
+      10000
+    );
+  }
+
+  /**
+   * Uploads any file with custom path (new method for flexibility)
+   * @param filePath - Path to the file to upload
+   * @param timeout - Upload timeout in ms
+   */
+  async uploadCustomFile(filePath: string, timeout: number = 10000) {
+    await this.uploadHelper.uploadFile(
+      this.uploadInput,
+      filePath,
+      timeout
+    );
   }
 
   /**
@@ -217,4 +248,5 @@ export default class CustomTask {
     await this.mongoImage.dragTo(loc);
     await this.nodeImage.dragTo(loc);
   }
+
 }

@@ -2,6 +2,7 @@ import { Page, expect, Locator } from "@playwright/test";
 import fs from "fs";
 import path from "path";
 import { PdfReader } from "pdfreader";
+import {DownloadHelper} from "../../helpers/downloadFile";
 
 export default class DynamicTableExportPDFPage {
   readonly page: Page;
@@ -14,7 +15,8 @@ export default class DynamicTableExportPDFPage {
   readonly tableHeaders: Locator;
   readonly tableRows: Locator; // UPDATED to save downloads inside .artifacts folder at project root
 
-  downloadDir = path.resolve(process.cwd(), ".artifacts/pgdownloads");
+  //downloadDir = path.resolve(process.cwd(), ".artifacts/downloads");
+  private downloadHelper: DownloadHelper;
   /**
    * Initializes locators and ensures the download directory exists.
    *
@@ -34,9 +36,7 @@ export default class DynamicTableExportPDFPage {
     );
     this.tableRows = page.locator('//div[@class="overflow-x-auto"]//tbody/tr');
 
-    if (!fs.existsSync(this.downloadDir)) {
-      fs.mkdirSync(this.downloadDir, { recursive: true });
-    }
+    this.downloadHelper = new DownloadHelper(page);
   }
   /**
    * Navigates to the Dynamic Table Export page inside the Playground Components section.
@@ -103,16 +103,14 @@ export default class DynamicTableExportPDFPage {
    * The file path where the PDF was saved.
    */
 
-  async exportToPDF(): Promise<string> {
-    const fileName = "dynamic_table_export.pdf";
-    const filePath = path.join(this.downloadDir, fileName);
-    const [download] = await Promise.all([
-      this.page.waitForEvent("download"),
-      this.pdfButton.click(),
-    ]);
-    await download.saveAs(filePath);
-    return filePath;
+    async exportToPDF(timeout: number = 30000): Promise<string> {
+    return await this.downloadHelper.downloadFile(
+      this.pdfButton, 
+      "dynamic_table_export.pdf",
+      timeout
+    );
   }
+
   /**
    * Reads and extracts text from the provided PDF file using PdfReader.
    *

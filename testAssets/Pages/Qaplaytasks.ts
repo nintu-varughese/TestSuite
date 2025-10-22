@@ -2,10 +2,13 @@ import { Page, expect, Locator } from "@playwright/test";
 import { SrvRecord } from "dns";
 import path from "path";
 import fs from "fs";
-
+import { DownloadHelper } from "../../helpers/downloadFile";
+import { UploadHelper } from "../../helpers/uploadFile";
 export default class Playground {
   // Page reference
   readonly page: Page;
+  private uploadHelper: UploadHelper;
+  private downloadHelper: DownloadHelper;
   // Locators for Dynamic Table
   readonly mainHead: Locator;
   readonly dynamicTableLink: Locator;
@@ -86,6 +89,8 @@ export default class Playground {
   readonly goBackButton: Locator;
   constructor(page: Page) {
     this.page = page;
+    this.uploadHelper = new UploadHelper(page); 
+    this.downloadHelper = new DownloadHelper(page);
 
     // Dynamic Table locators
     this.mainHead = page.locator('//span[text()="QA Playground"]');
@@ -496,7 +501,7 @@ export default class Playground {
 
    const filePath = path.resolve(
     process.cwd(),
-    ".artifacts",
+    ".artifacts/downloads",
     await download.suggestedFilename()
   );
     await download.saveAs(filePath);

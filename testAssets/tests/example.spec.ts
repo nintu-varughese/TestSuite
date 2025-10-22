@@ -18,7 +18,7 @@ test.describe("File download, upload and drag drop functionalities", () => {
       await expect(
         custom.downloadPageHeading,
         "expected download page header is not visible"
-      ).not.toBeVisible();
+      ).toBeVisible();
     });
 
     await test.step("Enter data and generate download  file", async () => {
@@ -38,6 +38,7 @@ test.describe("File download, upload and drag drop functionalities", () => {
   test("upload, remove and upload a file and verify the status", async ({
     custom,
   }) => {
+    const filePath = "testAssets/testData/downloadtxt/info.txt";
     await test.step("Launch the website and navigate to Upload page", async () => {
       await custom.launchWebsite();
       await expect(custom.mainHead).toBeVisible();
@@ -46,7 +47,8 @@ test.describe("File download, upload and drag drop functionalities", () => {
     });
 
     await test.step("Upload a file", async () => {
-      await custom.uploadFile();
+      
+      await custom.uploadFile(filePath);
     });
 
     await test.step("Remove uploaded file and verify input is empty", async () => {
@@ -58,7 +60,8 @@ test.describe("File download, upload and drag drop functionalities", () => {
     });
 
     await test.step("Upload file again and submit upload", async () => {
-      await custom.uploadFile();
+     
+      await custom.uploadFile(filePath);
       await custom.submitUpload();
     });
   });

@@ -1,7 +1,7 @@
 import { expect, Locator } from "@playwright/test";
 import { Page } from "@playwright/test";
 import * as fs from "fs";
-
+import{ DownloadHelper } from "../../helpers/downloadFile";
 export default class DynamicTableExportPage {
   readonly page: Page;
   readonly nameInp: Locator;
@@ -10,8 +10,10 @@ export default class DynamicTableExportPage {
   readonly stockInp: Locator;
   readonly addButton: Locator;
   readonly excelButton: Locator;
+  private downloadHelper: DownloadHelper;
   constructor(page: Page) {
     this.page = page;
+    this.downloadHelper = new DownloadHelper(page);
     this.nameInp = page.locator('//input[@placeholder="Name"]');
     this.categoryInp = page.locator('//input[@placeholder="Category"]');
     this.priceInp = page.locator('//input[@placeholder="Price"]');
@@ -54,12 +56,10 @@ export default class DynamicTableExportPage {
    * @param {string} savePath - The file path where the Excel file will be saved.
    * @returns {Promise<void>} Resolves after the file is downloaded and saved.
    */
-  async exportToExcel(savePath: string) {
-    const [download] = await Promise.all([
-      this.page.waitForEvent("download"),
-      this.excelButton.click(),
-    ]);
-    const filePath = `${savePath}/exported_table.xlsx`;
-    await download.saveAs(filePath);
+   async exportToExcel(): Promise<string> {
+    return await this.downloadHelper.downloadFile(
+      this.excelButton, 
+      "exported_table.xlsx"
+    );
   }
 }

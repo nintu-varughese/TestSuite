@@ -57,7 +57,7 @@ export default class StaticTablePDFPage {
 async downloadPDF(): Promise<string> {
   const fileName = "static_employee_data.pdf";
   // Make sure artifacts folder path is resolved to project root
-  const artifactsDir = path.resolve(process.cwd(), ".artifacts");
+  const artifactsDir = path.resolve(process.cwd(), ".artifacts/downloads");
   const filePath = path.join(artifactsDir, fileName);
 
   // Ensure the .artifacts folder exists
