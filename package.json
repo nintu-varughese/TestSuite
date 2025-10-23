@@ -20,6 +20,9 @@
   },
   "dependencies": {
     "allure-single-html-file-js": "^0.0.6",
-    "dotenv": "^17.2.3"
+    "dotenv": "^17.2.3",
+    "fs-extra": "^11.3.2",
+    "pdfreader": "^3.0.7",
+    "xlsx": "^0.18.5"
   }
 }
