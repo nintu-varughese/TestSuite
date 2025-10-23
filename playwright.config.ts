@@ -1,75 +1,74 @@
-import { defineConfig, devices, ReporterDescription } from '@playwright/test';
-import * as dotenv from 'dotenv';
+import { defineConfig, devices} from '@playwright/test';
 import path from 'path';
-import fs from 'fs';
+import * as dotenv from 'dotenv';
 
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
-// --- Ensure artifacts folder and subfolders exist ---
-const artifactsDir = path.resolve(__dirname, '.artifacts');
-const folders = ['allure-results', 'videos', 'test-results', 'downloadFile'];
+export default defineConfig({
+  globalSetup: path.resolve(__dirname, 'global-setup.ts'),
 
-// Create artifacts folder if missing
-if (!fs.existsSync(artifactsDir)) fs.mkdirSync(artifactsDir, { recursive: true });
+/**
+ * Read environment variables from file.
+ * [https://github.com/motdotla/dotenv](https://github.com/motdotla/dotenv)
+ */
+// import dotenv from 'dotenv';
+// import path from 'path';
+// dotenv.config({ path: path.resolve(__dirname, '.env') });
 
-// Move existing folders into artifacts and ensure they exist
-folders.forEach((folder) => {
-  const src = path.resolve(__dirname, folder); // current project root
-  const dest = path.join(artifactsDir, folder);
+/**
+ * See [https://playwright.dev/docs/test-configuration](https://playwright.dev/docs/test-configuration).
+ */
 
-  // Move folder if it exists in root
-  if (fs.existsSync(src)) {
-    // Remove destination if already exists
-    if (fs.existsSync(dest)) fs.rmSync(dest, { recursive: true, force: true });
-    fs.renameSync(src, dest);
-  }
+  testDir: 'testAssets/tests',
+  /* Run tests in files in parallel */
+  fullyParallel: true,
 
-  // Ensure the folder exists in artifactsDir
-  if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
-});
-
-// --- Reporter configuration ---
-const reporters: ReporterDescription[] = [
-  ['list'],
-  ['html', { open: 'never' }],
-  [
-    'allure-playwright',
-    {
-      outputFolder: path.join(artifactsDir, 'allure-results'),
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  forbidOnly: !!process.env.CI,
+  /* Retry on CI only */
+  retries: process.env.CI ? 2 : 0,
+  /* Opt out of parallel tests on CI. */
+  workers: process.env.CI ? 5 : undefined,
+  /* Reporter to use. See [https://playwright.dev/docs/test-reporters](https://playwright.dev/docs/test-reporters) */
+   reporter: [
+ ['html', { open: 'always' }],
+    ['list'],
+    ['allure-playwright', {
+      outputFolder: './.artifacts/allure-results', 
       detail: false,
       suiteTitle: false,
       useCucumberStepReporter: false,
-      useStepsForHooks: false,
-      screenshots: 'on',
-      videos: 'on',
-    },
+      useStepsForHooks: false
+    }]
   ],
-];
-
-export default defineConfig({
-  testDir: './testAssets/tests',
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: reporters,
-
+  /* Shared settings for all the projects below. See [https://playwright.dev/docs/api/class-testoptions](https://playwright.dev/docs/api/class-testoptions). */
   use: {
-    baseURL: process.env.BASE_URL,
+    /* Base URL to use in actions like `await page.goto('')`. */
+    // baseURL: 'http://localhost:3000',
+    
+    /* Collect trace when retrying the failed test. See [https://playwright.dev/docs/trace-viewer](https://playwright.dev/docs/trace-viewer) */
     trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    headless: true,
-    contextOptions: {
-      recordVideo: { dir: path.join(artifactsDir, 'videos'), size: { width: 1280, height: 720 } },
-    },
-    viewport: { width: 1280, height: 720 },
-    actionTimeout: 30_000,
-    navigationTimeout: 60_000,
-    acceptDownloads: true,
+    screenshot: 'on', // Attach screenshots automatically
+    video: 'on',
+    headless: true
   },
 
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  /* Configure projects for major browsers */
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
 
-  // Playwright artifacts (screenshots, traces)
-  outputDir: path.join(artifactsDir, 'test-results'),
+    // Other browsers can be enabled if needed
+  ],
+
+  /* Run your local dev server before starting the tests */
+  // webServer: {
+  //   command: 'npm run start',
+  //   url: 'http://localhost:3000',
+  //   reuseExistingServer: !process.env.CI,
+  // },
+
+
 });
