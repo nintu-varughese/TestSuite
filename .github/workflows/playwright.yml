@@ -28,6 +28,15 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: Suite1
+          - suite: Suite2
+          - suite: Suite3
+          - suite: Suite4
+    if: ${{ github.event.inputs.suite == 'All' || github.event.inputs.suite == matrix.suite }}
 
     steps:
       - name: Checkout repository
@@ -47,7 +56,7 @@ jobs:
       - name: Define suite specs
         id: define_suite
         run: |
-          case "${{ github.event.inputs.suite }}" in
+          case "${{ matrix.suite }}" in
             "Suite1")
               SPECS="tests/automationDemoSite.spec.ts tests/dynamicTablePDF.spec.ts"
               ;;
@@ -60,13 +69,10 @@ jobs:
             "Suite4")
               SPECS="tests/playgroundIMG.spec.ts tests/qaPlayground.spec.ts tests/qaPlaygroundDemoSite.spec.ts tests/screener.spec.ts"
               ;;
-            "All")
-              SPECS="tests/*.spec.ts"
-              ;;
           esac
 
           echo "suite_specs=$SPECS" >> $GITHUB_OUTPUT
-          echo "Selected Suite: ${{ github.event.inputs.suite }}"
+          echo "Selected Suite: ${{ matrix.suite }}"
           echo "Specs: $SPECS"
 
       - name: Run Playwright tests
@@ -82,21 +88,48 @@ jobs:
         run: |
           npx allure generate allure-results --clean -o allure-report
 
-      - name: Upload Allure report
+      - name: Upload suite-specific Allure report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-report-${{ github.event.inputs.suite }}-${{ github.event.inputs.browser }}
+          name: allure-${{ matrix.suite }}
           path: allure-report
           retention-days: 30
 
-      - name: Add summary
-        if: always()
+  combine-reports:
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ github.event.inputs.suite == 'All' }}
+    steps:
+      - name: Download all suite reports
+        uses: actions/download-artifact@v4
+        with:
+          path: combined-reports
+
+      - name: Create combined dashboard
         run: |
-          echo "### ✅ Playwright Suite Report" >> $GITHUB_STEP_SUMMARY
-          echo "**Suite:** ${{ github.event.inputs.suite }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Browser:** ${{ github.event.inputs.browser }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🧩 Specs included: ${{ steps.define_suite.outputs.suite_specs }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Allure report is available in the Artifacts section above." >> $GITHUB_STEP_SUMMARY
+          mkdir -p final-dashboard
+          DASHBOARD="final-dashboard/index.html"
+
+          echo "<html><head><title>Allure Suite Dashboard</title></head><body>" >> $DASHBOARD
+          echo "<h1>✅ Playwright Allure Suite Dashboard</h1>" >> $DASHBOARD
+          echo "<p>Generated on $(date)</p><ul>" >> $DASHBOARD
+
+          for dir in combined-reports/allure-*; do
+            SUITE_NAME=$(basename "$dir" | cut -d'-' -f2)
+            REPORT_PATH="$dir/index.html"
+            if [ -f "$REPORT_PATH" ]; then
+              echo "<li><a href='$REPORT_PATH'>Allure Report for $SUITE_NAME</a></li>" >> $DASHBOARD
+            else
+              echo "<li>$SUITE_NAME – Report missing</li>" >> $DASHBOARD
+            fi
+          done
+
+          echo "</ul></body></html>" >> $DASHBOARD
+
+      - name: Upload combined dashboard
+        uses: actions/upload-artifact@v4
+        with:
+          name: combined-dashboard
+          path: final-dashboard
+          retention-days: 30
