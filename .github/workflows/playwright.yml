@@ -1,10 +1,21 @@
-name: Playwright Tests
+name: Playwright Suite Tests
 
 on:
   workflow_dispatch:
     inputs:
+      suite:
+        description: 'Select the test suite to run'
+        required: true
+        type: choice
+        default: 'Suite1'
+        options:
+          - Suite1
+          - Suite2
+          - Suite3
+          - Suite4
+          - All
       browser:
-        description: 'Select browser to run tests on'
+        description: 'Select the browser to run on'
         required: true
         type: choice
         default: 'chromium'
@@ -14,117 +25,78 @@ on:
           - webkit
           - All
 
-      spec:
-        description: 'Select spec file to run'
-        required: true
-        type: choice
-        default: 'automationDemoSite.spec.ts'
-        options:
-          - automationDemoSite.spec.ts
-          - dynamicTablePDF.spec.ts
-          - example.spec.ts
-          - playgpdf.spec.ts
-          - playgrounddoc.spec.ts
-          - playgroundDynamic.spec.ts
-          - playgroundIMG.spec.ts
-          - qaPlayground.spec.ts
-          - qaPlaygroundDemoSite.spec.ts
-          - screener.spec.ts
-          - All
-
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # Install dependencies
       - name: Install dependencies
         run: npm ci
 
-      # Install Playwright browsers
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      # Run Playwright tests (based on selection)
+      - name: Define suite specs
+        id: define_suite
+        run: |
+          case "${{ github.event.inputs.suite }}" in
+            "Suite1")
+              SPECS="tests/automationDemoSite.spec.ts tests/dynamicTablePDF.spec.ts"
+              ;;
+            "Suite2")
+              SPECS="tests/example.spec.ts tests/playgpdf.spec.ts"
+              ;;
+            "Suite3")
+              SPECS="tests/playgrounddoc.spec.ts tests/playgroundDynamic.spec.ts"
+              ;;
+            "Suite4")
+              SPECS="tests/playgroundIMG.spec.ts tests/qaPlayground.spec.ts tests/qaPlaygroundDemoSite.spec.ts tests/screener.spec.ts"
+              ;;
+            "All")
+              SPECS="tests/*.spec.ts"
+              ;;
+          esac
+
+          echo "suite_specs=$SPECS" >> $GITHUB_OUTPUT
+          echo "Selected Suite: ${{ github.event.inputs.suite }}"
+          echo "Specs: $SPECS"
+
       - name: Run Playwright tests
         run: |
-          echo "Running on browser: ${{ github.event.inputs.browser }}"
-          echo "Running spec: ${{ github.event.inputs.spec }}"
-
           if [ "${{ github.event.inputs.browser }}" = "All" ]; then
-            if [ "${{ github.event.inputs.spec }}" = "All" ]; then
-              npx playwright test --reporter=html
-            else
-              npx playwright test tests/${{ github.event.inputs.spec }} --reporter=html
-            fi
+            npx playwright test ${{ steps.define_suite.outputs.suite_specs }} --reporter=line,allure-playwright
           else
-            if [ "${{ github.event.inputs.spec }}" = "All" ]; then
-              npx playwright test --project=${{ github.event.inputs.browser }} --reporter=html
-            else
-              npx playwright test tests/${{ github.event.inputs.spec }} --project=${{ github.event.inputs.browser }} --reporter=html
-            fi
+            npx playwright test ${{ steps.define_suite.outputs.suite_specs }} --project=${{ github.event.inputs.browser }} --reporter=line,allure-playwright
           fi
 
-      # Upload Playwright HTML report
-      - name: Upload Playwright HTML report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report-${{ github.event.inputs.browser }}
-          path: playwright-report/
-          retention-days: 30
-
-      # Zip only the downloaded files and set output
-      - name: Zip downloaded files
-        id: zip_downloaded_files
+      - name: Generate Allure report
         if: always()
         run: |
-          DOWNLOAD_DIR=".artifacts/downloads"
-          ZIP_FILE=".artifacts/downloads.zip"
+          npx allure generate allure-results --clean -o allure-report
 
-          echo "Contents of $DOWNLOAD_DIR before zip:"
-          ls -al "$DOWNLOAD_DIR" || echo "Directory not found"
-
-          if [ -d "$DOWNLOAD_DIR" ]; then
-            mkdir -p .artifacts
-            zip -r "$ZIP_FILE" "$DOWNLOAD_DIR"
-            if [ -f "$ZIP_FILE" ]; then
-              echo "zip_created=true" >> $GITHUB_OUTPUT
-              echo "ZIP file created successfully: $ZIP_FILE"
-            else
-              echo "zip_created=false" >> $GITHUB_OUTPUT
-              echo "Failed to create ZIP file"
-            fi
-          else
-            echo "No downloaded files found"
-            echo "zip_created=false" >> $GITHUB_OUTPUT
-          fi
-
-      # Upload zipped downloaded files as workflow artifact
-      - name: Upload downloaded files as artifact
-        if: ${{ steps.zip_downloaded_files.outputs.zip_created == 'true' }}
+      - name: Upload Allure report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: downloaded-files
-          path: .artifacts/downloads.zip
+          name: allure-report-${{ github.event.inputs.suite }}-${{ github.event.inputs.browser }}
+          path: allure-report
           retention-days: 30
 
-      # Add summary
       - name: Add summary
+        if: always()
         run: |
-          echo "### Playwright Manual Test Run" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Playwright Suite Report" >> $GITHUB_STEP_SUMMARY
+          echo "**Suite:** ${{ github.event.inputs.suite }}" >> $GITHUB_STEP_SUMMARY
           echo "**Browser:** ${{ github.event.inputs.browser }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Spec:** ${{ github.event.inputs.spec }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Report and downloaded files are available in the Artifacts section above." >> $GITHUB_STEP_SUMMARY
+          echo "🧩 Specs included: ${{ steps.define_suite.outputs.suite_specs }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Allure report is available in the Artifacts section above." >> $GITHUB_STEP_SUMMARY
